@@ -51,7 +51,7 @@ class FileManager
           $zip->extractTo($destination);
           $zip->close();
         } else {
-          throw new FileAccessDeniedException($file);
+          throw new Exception\FileAccessDeniedException($file);
         }
     }
     

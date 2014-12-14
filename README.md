@@ -3,7 +3,7 @@ scloud
 scloud is a symfony2 project mainly focused on storing images on a server.
 It also supports other type of files just like dropbox but it has more features for images like batch processing with injected handlers.
 The main features of this project is the advanced sharing and groups for files and directories
-I give away free 50GB of hard disk to anyone helping me out with the frontend of this project ;)
+I give away 50GB of space for free to anyone helping me out with the frontend of this project ;)
 
 Why?
 -------

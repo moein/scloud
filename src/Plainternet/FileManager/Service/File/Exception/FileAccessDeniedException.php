@@ -1,6 +1,6 @@
 <?php
 
-namespace Plainternet\FileManager\Service\File;
+namespace Plainternet\FileManager\Service\File\Exception;
 
 class FileAccessDeniedException extends \Exception
 {

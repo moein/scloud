@@ -91,10 +91,19 @@ class FileProcessor
      */
     public function registerHandler(array $extensions, FileHandlerInterface $handler)
     {
+        if (count(array_intersect($extensions, array_keys($this->getHandlers())))) {
+            throw new Exception\ConflictiveHandlerException('Can not register two handlers for an extension!');
+        }
+        
         $this->handlers = array_merge(
-            $this->handlers,
+            $this->getHandlers(),
             array_fill_keys($extensions, $handler)
         );
+    }
+    
+    public function getHandlers()
+    {
+        return $this->handlers;
     }
     
     /**
@@ -103,7 +112,7 @@ class FileProcessor
      */
     protected function handle($file)
     {
-        return $this->handlers[$file->getExtension()]->handle($file);
+        return $this->getHandlers()[$file->getExtension()]->handle($file);
     }
     
     /**
