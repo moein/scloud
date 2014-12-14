@@ -62,7 +62,18 @@ doctrine:
 
     orm:
         auto_generate_proxy_classes: "%kernel.debug%"
-        auto_mapping: true
+        auto_generate_proxy_classes: %kernel.debug%
+        entity_managers:
+            default:
+                mappings:
+                    PlainternetUserBundle: ~
+                    PlainternetFileManagerBundle:
+                        type: yml
+                        dir: ../../Module/FileManager/Infrastructure/Mapping/Doctrine/ORM
+                        prefix: Plainternet\Module\FileManager\Entity
+        resolve_target_entities:
+            Plainternet\Module\FileManager\Model\UserInterface: Plainternet\Bundle\UserBundle\Entity\User
+
 
 # Swiftmailer Configuration
 swiftmailer:
@@ -71,3 +82,8 @@ swiftmailer:
     username:  "%mailer_user%"
     password:  "%mailer_password%"
     spool:     { type: memory }
+
+fos_user:
+    db_driver: orm # other valid values are 'mongodb', 'couchdb' and 'propel'
+    firewall_name: main
+    user_class: Plainternet\Bundle\UserBundle\Entity\User

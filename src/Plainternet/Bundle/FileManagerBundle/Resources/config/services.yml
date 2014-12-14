@@ -1,4 +1,28 @@
 services:
-#    plainternet_file_manager.example:
-#        class: Plainternet\Bundle\FileManagerBundle\Example
-#        arguments: [@service_id, "plain_value", %parameter%]
+    plainternet_file_manager.file_repository:
+        class: Plainternet\Module\FileManager\Application\Repository\FileRepository
+        factory_service: doctrine
+        factory_method: getRepository
+        arguments: [ Plainternet\Module\FileManager\Entity\File ]
+        
+    plainternet_file_manager.system_file_manager:
+        class: Plainternet\Module\FileManager\Component\File\SystemFileManager
+        arguments: [%temp_directory%]
+        
+    plainternet_file_manager.file_processor:
+        class: Plainternet\Module\FileManager\Service\File\FileProcessor
+        calls:
+            - [setFileManager, [@plainternet_file_manager.file_manager]]
+            - [setSystemFileManager, [@plainternet_file_manager.system_file_manager]]
+            - [registerHandler, [[jpeg, jpg, png], @plainternet_file_manager.image_handler]]
+        
+    plainternet_file_manager.file_manager:
+        class: Plainternet\Module\FileManager\Service\File\FileManager
+        arguemnts: [%temp_directory%]
+        calls:
+            - [setSystemFileManager, [@plainternet_file_manager.system_file_manager]]
+            - [setUsersFilesDirectory, [%users_files_directory%]]
+            - [setRepository, [@plainternet_file_manager.file_repository]]
+        
+    plainternet_file_manager.image_handler:
+        class: Plainternet\Module\FileManager\Service\FileHandler\ImageHandler

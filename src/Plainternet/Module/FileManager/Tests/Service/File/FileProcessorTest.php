@@ -1,10 +1,10 @@
 <?php
 
-namespace Plainternet\FileManager\Tests\Service\File;
+namespace Plainternet\Module\FileManager\Tests\Service\File;
 
 use Prophecy;
-use Plainternet\FileManager\Service\File\FileProcessor;
-use Plainternet\FileManager\Service\File\Exception\ConflictiveHandlerException;
+use Plainternet\Module\FileManager\Service\File\FileProcessor;
+use Plainternet\Module\FileManager\Service\File\Exception\ConflictiveHandlerException;
 
 class FileProcessorTest extends \PHPUnit_Framework_TestCase
 {
@@ -20,18 +20,46 @@ class FileProcessorTest extends \PHPUnit_Framework_TestCase
         $this->prophet = new Prophecy\Prophet;
     }
     
+    protected function tearDown()
+    {
+        $this->prophet->checkPredictions();
+    }
+    
     protected function getProphecy()
     {
         return $this->prophet->prophesize();
     }
     
+    protected function getSystemFileManager()
+    {
+        $prophecy = $this->getProphecy();
+        $prophecy->willExtend('Plainternet\Module\FileManager\Component\File\SystemFileManager');
+        
+        return $prophecy;
+    }
+    
+    protected function getUser()
+    {
+        $prophecy = $this->getProphecy();
+        $prophecy->willImplement('Plainternet\Module\FileManager\Model\UserInterface');
+        
+        return $prophecy;
+    }
+    
+    protected function getDirectory()
+    {
+        $prophecy = $this->getProphecy();
+        $prophecy->willExtend('Plainternet\Module\FileManager\Entity\Directory');
+        
+        return $prophecy;
+    }
+    
     protected function getFileManager()
     {
         $prophecy = $this->getProphecy();
-        $prophecy->willExtend('Plainternet\FileManager\Service\File\FileManager');
-        $prophecy->move(self::IRRELEVANT_SOURCE_PATH, self::IRRELEVANT_DESTINATION_PATH);
+        $prophecy->willExtend('Plainternet\Module\FileManager\Service\File\FileManager');
         
-        return $prophecy->reveal();
+        return $prophecy;
     }
     
     /**
@@ -60,12 +88,24 @@ class FileProcessorTest extends \PHPUnit_Framework_TestCase
         $file = $prophecy->reveal();
         $prophecy->getPathname()->willReturn(self::IRRELEVANT_SOURCE_PATH);
         
+        $systemFileManager = $this->getSystemFileManager();
+        $systemFileManager->move(self::IRRELEVANT_SOURCE_PATH, self::IRRELEVANT_DESTINATION_PATH);
+        
         $fileManager = $this->getFileManager();
+
+        $fileManager->createDiretoryRecursively(
+            Prophecy\Argument::any(), 
+            Prophecy\Argument::type('Plainternet\Module\FileManager\Model\UserInterface')
+        )->willReturn($this->getDirectory()->reveal());
+        $fileManager->createFile(
+            Prophecy\Argument::any(), 
+            Prophecy\Argument::type('Plainternet\Module\FileManager\Entity\Directory')
+        )->willReturn(null);
         
         $fileProcessor = $this->getFileProcessor();
-        $fileProcessor->setFileManager($fileManager);
+        $fileProcessor->setFileManager($fileManager->reveal());
         
-        $fileProcessor->process($file, self::IRRELEVANT_DESTINATION_PATH);
+        $fileProcessor->process($file, self::IRRELEVANT_DESTINATION_PATH, $this->getUser()->reveal());
     }
     
     public function testRegisterHandler()
@@ -74,7 +114,7 @@ class FileProcessorTest extends \PHPUnit_Framework_TestCase
         
         //Prophecy for handler
         $prophecy = $this->getProphecy();
-        $prophecy->willImplement('Plainternet\FileManager\Service\File\FileHandlerInterface');
+        $prophecy->willImplement('Plainternet\Module\FileManager\Service\File\FileHandlerInterface');
         
         $extensions = array('jpg', 'jpeg');
         $handler = $prophecy->reveal();
@@ -82,7 +122,7 @@ class FileProcessorTest extends \PHPUnit_Framework_TestCase
         $handlers = $fileProcessor->getHandlers();
         
         $this->assertEquals($extensions, array_keys($handlers), 'The indexes of the handlers are based on extensions');
-        $this->assertInstanceOf('Plainternet\FileManager\Service\File\FileHandlerInterface', $handlers['jpg']);
+        $this->assertInstanceOf('Plainternet\Module\FileManager\Service\File\FileHandlerInterface', $handlers['jpg']);
         
         $fileProcessor->registerHandler(array('png'), $handler);
         $this->assertArrayHasKey('png', $fileProcessor->getHandlers());
@@ -95,7 +135,7 @@ class FileProcessorTest extends \PHPUnit_Framework_TestCase
         }
         
         $this->assertInstanceOf(
-            'Plainternet\FileManager\Service\File\Exception\ConflictiveHandlerException',
+            'Plainternet\Module\FileManager\Service\File\Exception\ConflictiveHandlerException',
             $e,
             'FileProcessor should throws an exception in case of registering a handler for an extension that is already registered!'
         );

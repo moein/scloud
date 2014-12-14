@@ -1,0 +1,4 @@
+services:
+#    plainternet_user.example:
+#        class: Plainternet\Bundle\UserBundle\Example
+#        arguments: [@service_id, "plain_value", %parameter%]

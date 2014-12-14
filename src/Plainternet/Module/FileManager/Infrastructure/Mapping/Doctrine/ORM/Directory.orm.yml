@@ -1,0 +1,41 @@
+Plainternet\Module\FileManager\Entity\Directory:
+    type:  entity
+    table: directory
+    id:
+        id:
+            type: integer
+            generator:
+                strategy: AUTO
+    
+    fields:
+        name:
+            type: string
+            length: 100
+        path:
+            type: string
+            length: 500
+            
+    
+    
+    manyToOne:
+        parent:
+            targetEntity: Plainternet\Module\FileManager\Entity\Directory
+            inversedBy: children
+            joinColumn:
+                name: parent_id
+                referencedColumnName: id
+        owner:
+            targetEntity: Plainternet\Module\FileManager\Model\UserInterface
+            joinColumn:
+                name: owner_id
+                referencedColumnName: id
+                
+    oneToMany:
+        children:
+            targetEntity: Plainternet\Module\FileManager\Entity\Directory
+            mappedBy: parent
+                
+    oneToMany:
+        files:
+            targetEntity: Plainternet\Module\FileManager\Entity\File
+            mappedBy: directory

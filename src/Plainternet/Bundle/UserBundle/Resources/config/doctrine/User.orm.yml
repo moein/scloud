@@ -1,0 +1,14 @@
+Plainternet\Bundle\UserBundle\Entity\User:
+    type:  entity
+    table: user
+    id:
+        id:
+            type: integer
+            generator:
+                strategy: AUTO
+    oneToOne:
+        rootDirectory:
+            targetEntity: Plainternet\Module\FileManager\Entity\Directory
+            joinColumn:
+                name: root_directory_id
+                referencedColumnName: id

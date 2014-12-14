@@ -1,0 +1,21 @@
+Plainternet\Module\FileManager\Entity\File:
+    type:  entity
+    repositoryClass: Plainternet\Module\FileManager\Application\Repository\FileRepository
+    table: file
+    id:
+        id:
+            type: integer
+            generator:
+                strategy: AUTO
+    fields:
+        name:
+            type: string
+            length: 100
+
+    manyToOne:
+        directory:
+            targetEntity: Plainternet\Module\FileManager\Entity\Directory
+            inversedBy: files
+            joinColumn:
+                name: directory_id
+                referencedColumnName: id

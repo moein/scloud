@@ -1,12 +1,19 @@
 <?php
 
-namespace Plainternet\FileManager\Service\File;
+namespace Plainternet\Module\FileManager\Component\File;
 
 use Symfony\Component\Finder\Finder;
 use Symfony\Component\HttpFoundation\File\File;
 
-class FileManager
+class SystemFileManager
 {
+    protected $tempDirectory;
+    
+    public function __construct($tempDirectory)
+    {
+        $this->tempDirectory = $tempDirectory;
+    }
+    
     /**
      * Returns a the iterator for files matching the extensions.
      * If no extension is provided all the files are returned
@@ -24,10 +31,20 @@ class FileManager
             ->depth(0)
             ->in($directory);
         foreach ($extensions as $extension) {
-            $iterator->name('*.' . $extension);
+            $iterator->name('/\.' . $extension . '$/i');
         }
         
         return $iterator;
+    }
+    
+    public function removeFile($path)
+    {
+        @unlink($path);
+    }
+    
+    public function removeDirectory($directory)
+    {
+        rmdir($directory);
     }
     
     public function move($source, $destination)
@@ -43,9 +60,10 @@ class FileManager
      * @param string $destination
      * @throws FileAccessDeniedException
      */
-    public function unzip($file, $destination)
+    public function unzip($file)
     {
-        $zip = new ZipArchive;
+        $destination = $this->tempDirectory . DIRECTORY_SEPARATOR . uniqid('scloud_');
+        $zip = new \ZipArchive;
         $res = $zip->open($file);
         if ($res === true) {
           $zip->extractTo($destination);
@@ -53,10 +71,12 @@ class FileManager
         } else {
           throw new Exception\FileAccessDeniedException($file);
         }
+        
+        return $destination;
     }
     
-    public function createDirectory($directory, $recursive = false)
+    public function createSystemDirectory($directory, $recursive = false)
     {
-        mkdir($directory, 0777, $recursive);
+        @mkdir($directory, 0777, $recursive);
     }
 }

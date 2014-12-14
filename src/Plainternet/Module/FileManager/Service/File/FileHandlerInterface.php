@@ -1,5 +1,5 @@
 <?php
-namespace Plainternet\FileManager\Service\File;
+namespace Plainternet\Module\FileManager\Service\File;
 
 interface FileHandlerInterface
 {
