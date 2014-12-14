@@ -1,0 +1,3 @@
+plainternet_file_manager_homepage:
+    path:     /hello/{name}
+    defaults: { _controller: PlainternetFileManagerBundle:Default:index }

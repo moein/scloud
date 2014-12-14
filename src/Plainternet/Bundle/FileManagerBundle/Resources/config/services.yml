@@ -1,0 +1,4 @@
+services:
+#    plainternet_file_manager.example:
+#        class: Plainternet\Bundle\FileManagerBundle\Example
+#        arguments: [@service_id, "plain_value", %parameter%]
