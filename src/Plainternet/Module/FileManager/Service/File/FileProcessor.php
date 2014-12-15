@@ -75,6 +75,8 @@ class FileProcessor
         }
         
         $this->systemFileManager->removeDirectory($tempDirectory);
+        
+        return count($files);
     }
     
     /**

@@ -140,4 +140,22 @@ class FileProcessorTest extends \PHPUnit_Framework_TestCase
             'FileProcessor should throws an exception in case of registering a handler for an extension that is already registered!'
         );
     }
+    
+    public function testBatchProcess()
+    {
+        $fileProcessor = $this->getFileProcessor();
+        
+        $systemFileManager = $this->getSystemFileManager();
+        $systemFileManager->getFilesInDirectory(
+            Prophecy\Argument::any(),
+            Prophecy\Argument::any()
+        )->willReturn(array());
+        $systemFileManager->unzip(Prophecy\Argument::any())->willReturn('a path');
+        $systemFileManager->removeDirectory(Prophecy\Argument::any())->willReturn(null);
+        
+        $fileProcessor->setSystemFileManager($systemFileManager->reveal());
+        $result = $fileProcessor->batchProcess('anything', $this->getUser()->reveal());
+        
+        $this->assertEquals(0, $result, 'Because we did not return anything in getFilesInDirectory it should process no files');
+    }
 }
